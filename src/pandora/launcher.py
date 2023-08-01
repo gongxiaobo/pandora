@@ -7,7 +7,7 @@ from os import getenv
 from loguru import logger
 from rich.prompt import Prompt, Confirm
 
-from . import __version__
+from .import __version__
 from .bots.legacy import ChatBot as ChatBotLegacy
 from .bots.server import ChatBot as ChatBotServer
 from .exts import sentry
@@ -30,6 +30,11 @@ __show_verbose = False
 
 
 def read_access_token(token_file):
+    '''
+    获取本地的token字符串
+    :param token_file:
+    :return:
+    '''
     with open(token_file, 'r') as f:
         return f.read().strip()
 
@@ -51,6 +56,8 @@ def save_access_token(access_token):
 
 def confirm_access_token(token_file=None, silence=False, api=False):
     app_token_file = os.path.join(USER_CONFIG_DIR, 'access_token.dat')
+    print(USER_CONFIG_DIR)
+
 
     app_token_file_exists = os.path.isfile(app_token_file)
     if app_token_file_exists and __show_verbose:
@@ -62,6 +69,7 @@ def confirm_access_token(token_file=None, silence=False, api=False):
             raise Exception('Error: {} is not a file.'.format(token_file))
 
         access_token = read_access_token(token_file)
+        print("access_token=",access_token)
         if os.path.isfile(app_token_file) and access_token == read_access_token(app_token_file):
             return access_token, False
 
@@ -72,6 +80,7 @@ def confirm_access_token(token_file=None, silence=False, api=False):
                                                  choices=['y', 'n', 'del'], default='y')
         if 'y' == confirm:
             access_token = read_access_token(app_token_file)
+            print("access_token=", access_token)
             if not check_access_token_out(access_token, api):
                 os.remove(app_token_file)
                 return None, True
